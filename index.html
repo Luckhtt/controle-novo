@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Controle de validade</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F1F4F2;--surface:#fff;--ink:#13221B;--muted:#5B6B63;--line:#D5DDD8;--brand:#0F5C4D;--on-brand:#fff;
+--ok:#2E7D4F;--y:#8F7200;--am:#B05F00;--or:#C2501B;--red:#B3261E;--exp:#5B1A16;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F1815;--surface:#17231F;--ink:#E6EEE9;--muted:#93A59B;--line:#2A3A33;--brand:#5BC4A8;--on-brand:#0F1815;--ok:#5CC287;--y:#D9B93A;--am:#E8993A;--or:#EE7C4A;--red:#F2766E;--exp:#C98B86}}
+:root[data-theme="dark"]{--bg:#0F1815;--surface:#17231F;--ink:#E6EEE9;--muted:#93A59B;--line:#2A3A33;--brand:#5BC4A8;--on-brand:#0F1815;--ok:#5CC287;--y:#D9B93A;--am:#E8993A;--or:#EE7C4A;--red:#F2766E;--exp:#C98B86}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.45 "Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:560px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:28px;line-height:1.1;font-weight:800;margin:4px 0 16px;letter-spacing:-.02em}
+h2{font-size:17px;margin:0;font-weight:600}
+.banner{border-radius:14px;padding:14px 16px;background:var(--surface);border:1px solid var(--line);margin-bottom:14px}
+.banner strong{display:block;font-size:18px}
+.banner.warn{border-color:var(--or);border-width:2px}
+.banner.bad{border-color:var(--red);border-width:2px}
+.banner span{color:var(--muted);font-size:14px}
+details{background:var(--surface);border:1px solid var(--line);border-radius:14px;margin-bottom:14px}
+summary{padding:14px 16px;cursor:pointer;font-weight:600;min-height:48px;list-style:none}
+summary::-webkit-details-marker{display:none}
+.pane{padding:0 16px 16px;display:grid;gap:10px}
+label{display:grid;gap:4px;font-size:14px;color:var(--muted)}
+input{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:11px 12px;min-height:46px;width:100%}
+input:focus-visible,button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+button,.btn{font:inherit;font-weight:600;border:0;border-radius:10px;min-height:46px;padding:0 16px;cursor:pointer;background:var(--brand);color:var(--on-brand);text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.tabs{display:flex;gap:8px;margin:6px 0 12px}
+.tabs button{flex:1;background:transparent;color:var(--ink);border:1px solid var(--line)}
+.tabs button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+li{background:var(--surface);border:1px solid var(--line);border-left:8px solid var(--c);border-radius:12px;padding:12px 14px;display:grid;gap:6px}
+li.ok{--c:var(--ok)}li.y{--c:var(--y)}li.am{--c:var(--am)}li.or{--c:var(--or)}li.red{--c:var(--red)}li.exp{--c:var(--exp)}
+.top{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.name{font-weight:600;font-size:17px;overflow-wrap:anywhere}
+.date{color:var(--muted);font-size:14px;white-space:nowrap}
+.status{color:var(--c);font-weight:600;font-size:15px}
+.meta{color:var(--muted);font-size:14px}
+.acts{display:flex;gap:8px;margin-top:2px}
+.acts button{min-height:40px;font-size:14px;flex:1}
+.empty{text-align:center;color:var(--muted);padding:28px 8px}
+.wa{margin-top:16px;display:grid;gap:10px}
+.wa .btn{background:#1FA855;color:#fff}
+.note{font-size:13px;color:var(--muted);margin:0}
+</style>
+</head>
+<body>
+<main>
+<h1>Controle de validade</h1>
+<div id="banner" class="banner" role="status"></div>
+
+<details id="formBox" open>
+<summary id="formTitle">Cadastrar produto</summary>
+<div class="pane">
+<label>Produto<input id="nome" maxlength="80" autocomplete="off" placeholder="Ex.: Leite integral 1L"></label>
+<div class="row">
+<label>Quantidade<input id="qtd" type="number" min="1" inputmode="numeric" value="1"></label>
+<label>Validade<input id="val" type="date"></label>
+</div>
+<label>Categoria (opcional)<input id="cat" maxlength="40" autocomplete="off" placeholder="Ex.: Laticínios"></label>
+<p id="err" class="note" style="color:var(--red)" role="alert"></p>
+<div class="row"><button id="save">Salvar produto</button><button id="cancel" class="ghost" hidden>Cancelar edição</button></div>
+</div>
+</details>
+
+<div class="tabs" role="group" aria-label="Filtro">
+<button data-f="todos" aria-pressed="true">Todos</button>
+<button data-f="atencao" aria-pressed="false">Precisam de atenção</button>
+</div>
+
+<ul id="list"></ul>
+
+<section class="wa">
+<h2>Avisar pelo WhatsApp</h2>
+<label>Seu número com DDD (opcional)<input id="tel" type="tel" inputmode="tel" placeholder="11999999999"></label>
+<a id="waLink" class="btn" target="_blank" rel="noopener">Enviar resumo no WhatsApp</a>
+<p class="note">O resumo lista os produtos que vencem em até 3 meses. O envio é feito por você, ao tocar no botão.</p>
+</section>
+</main>
+
+<script>
+(function(){
+var KEY='validade.v1',TEL='validade.tel';
+var items=read(KEY,[]),editId=null,filter='todos',armed=null;
+function read(k,d){try{var v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}}
+function write(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function today(){var d=new Date();d.setHours(0,0,0,0);return d}
+function daysLeft(iso){var p=iso.split('-').map(Number);return Math.round((new Date(p[0],p[1]-1,p[2])-today())/864e5)}
+function br(iso){var p=iso.split('-');return p[2]+'/'+p[1]+'/'+p[0]}
+function plural(n,s,p){return n+' '+(n===1?s:p)}
+function info(n){
+ if(n<0)return{c:'exp',t:'Vencido há '+plural(-n,'dia','dias')};
+ var t=n===0?'Vence hoje':n===1?'Vence amanhã':'Faltam '+n+' dias';
+ if(n<=7)return{c:'red',t:t+' (aviso de 7 dias)'};
+ if(n<=15)return{c:'red',t:t+' (aviso de 15 dias)'};
+ if(n<=30)return{c:'or',t:t+' (aviso de 1 mês)'};
+ if(n<=60)return{c:'am',t:t+' (aviso de 2 meses)'};
+ if(n<=90)return{c:'y',t:t+' (aviso de 3 meses)'};
+ return{c:'ok',t:t}
+}
+function sorted(){return items.slice().sort(function(a,b){return a.val<b.val?-1:a.val>b.val?1:0})}
+
+function render(){
+ var all=sorted(),exp=0,soon=0,att=[];
+ all.forEach(function(i){var n=daysLeft(i.val);if(n<0)exp++;if(n>=0&&n<=15)soon++;if(n<=90)att.push(i)});
+ var b=$('banner');
+ if(!all.length){b.className='banner';b.innerHTML='<strong>Nenhum produto cadastrado</strong><span>Cadastre o primeiro para começar a receber os avisos.</span>'}
+ else if(exp||soon){b.className='banner bad';b.innerHTML='<strong>'+(exp?plural(exp,'produto vencido','produtos vencidos'):'')+(exp&&soon?' e ':'')+(soon?plural(soon,'vence','vencem')+' em até 15 dias':'')+'</strong><span>'+plural(att.length,'produto precisa','produtos precisam')+' de atenção.</span>'}
+ else if(att.length){b.className='banner warn';b.innerHTML='<strong>'+plural(att.length,'produto vence','produtos vencem')+' em até 3 meses</strong><span>Veja a lista abaixo.</span>'}
+ else{b.className='banner';b.innerHTML='<strong>Tudo em dia</strong><span>Nenhum produto vence nos próximos 3 meses.</span>'}
+
+ var show=filter==='atencao'?att:all,ul=$('list');
+ if(!show.length){ul.innerHTML='<li class="empty" style="border-left-width:1px;display:block">'+(filter==='atencao'?'Nenhum produto precisa de atenção agora.':'Sua lista está vazia.')+'</li>'}
+ else ul.innerHTML=show.map(function(i){
+  var n=daysLeft(i.val),s=info(n),meta=['Qtd. '+i.qtd];if(i.cat)meta.push(esc(i.cat));
+  return '<li class="'+s.c+'"><div class="top"><span class="name">'+esc(i.nome)+'</span><span class="date">'+br(i.val)+'</span></div>'+
+  '<span class="status">'+s.t+'</span><span class="meta">'+meta.join(' / ')+'</span>'+
+  '<div class="acts"><button class="ghost" data-a="edit" data-id="'+i.id+'">Editar</button>'+
+  '<button class="ghost" data-a="del" data-id="'+i.id+'">'+(armed===i.id?'Confirmar exclusão':'Excluir')+'</button></div></li>'
+ }).join('');
+ waLink(att);
+}
+
+function waLink(att){
+ var tel=($('tel').value||'').replace(/\D/g,'');
+ if(tel&&tel.length<=11)tel='55'+tel;
+ var msg='Produtos com validade próxima:\n';
+ if(!att.length)msg='Nenhum produto vence nos próximos 3 meses.';
+ else att.forEach(function(i){var n=daysLeft(i.val);msg+='- '+i.nome+' (qtd. '+i.qtd+'): '+(n<0?'vencido em ':'vence em ')+br(i.val)+' ('+info(n).t.split(' (')[0].toLowerCase()+')\n'});
+ $('waLink').href='https://wa.me/'+tel+'?text='+encodeURIComponent(msg);
+}
+
+function resetForm(){editId=null;$('nome').value='';$('qtd').value='1';$('val').value='';$('cat').value='';$('err').textContent='';$('formTitle').textContent='Cadastrar produto';$('cancel').hidden=true}
+
+$('save').onclick=function(){
+ var nome=$('nome').value.trim(),val=$('val').value,qtd=parseInt($('qtd').value,10)||1,cat=$('cat').value.trim();
+ if(!nome){$('err').textContent='Informe o nome do produto.';return}
+ if(!val){$('err').textContent='Informe a data de validade.';return}
+ if(editId){items=items.map(function(i){return i.id===editId?{id:i.id,nome:nome,val:val,qtd:qtd,cat:cat}:i})}
+ else items.push({id:String(Date.now()),nome:nome,val:val,qtd:qtd,cat:cat});
+ write(KEY,items);resetForm();render();
+};
+$('cancel').onclick=resetForm;
+
+$('list').onclick=function(e){
+ var b=e.target.closest('button');if(!b)return;
+ var id=b.dataset.id;
+ if(b.dataset.a==='edit'){
+  var i=items.filter(function(x){return x.id===id})[0];if(!i)return;
+  editId=id;$('nome').value=i.nome;$('qtd').value=i.qtd;$('val').value=i.val;$('cat').value=i.cat||'';
+  $('formTitle').textContent='Editar produto';$('cancel').hidden=false;$('formBox').open=true;
+  $('formBox').scrollIntoView({behavior:'smooth'});
+ }else if(b.dataset.a==='del'){
+  if(armed===id){items=items.filter(function(x){return x.id!==id});armed=null;write(KEY,items)}else armed=id;
+  render();
+ }
+};
+document.querySelector('.tabs').onclick=function(e){
+ var b=e.target.closest('button');if(!b)return;
+ filter=b.dataset.f;armed=null;
+ Array.prototype.forEach.call(this.children,function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});
+ render();
+};
+$('tel').value=read(TEL,'');
+$('tel').oninput=function(){write(TEL,$('tel').value);render()};
+if(items.length)$('formBox').open=false;
+render();
+})();
+</script>
+</body>
+</html>
